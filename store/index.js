@@ -1,12 +1,19 @@
 export const state = () => ({
-  b_create_dialog:false,
+  message:null,
+  show_message:false,
 })
 
-export const getters =  {
-  get_b_create_dialog: (state) => state.b_create_dialog,
+export const getters = {
+  state_message: (state)=> state.show_message,
+
+  get_message: (state) => state.message
 }
 
-
 export const mutations = {
-  toggle_b_create_dialog:(state,toggle) => state.b_create_dialog = toggle
+  set_message: (state,mes) => (state.message = mes),
+
+  toggle_message:(state,s_mes)=>(state.show_message = s_mes),
+}
+
+export const actions ={
 }

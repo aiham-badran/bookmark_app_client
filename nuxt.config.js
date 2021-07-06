@@ -42,6 +42,7 @@ export default {
   plugins: [
     // vee-validate plugins
     '~/plugins/veeValidate',
+    '~/filters/global.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

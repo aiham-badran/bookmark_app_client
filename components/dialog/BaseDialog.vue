@@ -3,19 +3,22 @@
     persistent
     transition="dialog-bottom-transition"
     overlay-opacity=".6"
-    max-width="60vw"
+    :max-width="width"
     :fullscreen="isMobile"
     :value="dialog"
     overlay-color="main"
+    scrollable
   >
-    <v-card color="background">
+    <v-card color="background" style="overflow: auto">
       <v-toolbar class="mb-3" color="background" dense flat>
         <v-toolbar-title>
-          <v-toolbar-title class="text-capitalize">
-            {{ title }}
-          </v-toolbar-title>
+          <slot name="toolbar_title">
+            <v-toolbar-title class="text-capitalize">
+              <v-icon> {{ icon }}</v-icon>
+              {{ title }}
+            </v-toolbar-title>
+          </slot>
         </v-toolbar-title>
-
         <v-spacer></v-spacer>
 
         <v-toolbar-items>
@@ -49,7 +52,12 @@ export default {
 
   props: {
     title: String,
+    icon: String,
     dialog: false,
+    width: {
+      type: String,
+      default: '60vw',
+    },
   },
   // ------ props -----
 

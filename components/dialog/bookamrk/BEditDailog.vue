@@ -1,14 +1,20 @@
 <template>
   <base-dialog
-    :dialog="dialog"
+    :dialog="edit_state"
     @close="close"
-    :title="$vuetify.lang.t(`$vuetify.bookmark.form.edit.header`)"
+    :title="$vuetify.lang.t(`$vuetify.bookmark.edit.header`)"
+    icon="mdi-pencil-outline"
   >
     <div class="px-5">
-      <p class="text-subtitle-2 text--secondary my-6">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Cum
-        reprehenderit quis deserunt aliquam eius vero aperiam velit itaque
-      </p>
+      <div class="d-flex align-center text-subtitle-2 text--secondary my-6">
+        <v-avatar size="28px" tile class=""
+          ><img src="/vuetify-logo.svg"
+        /></v-avatar>
+        <span class="px-4">{{ bookmark.url }}</span>
+        <v-btn small plain link class="mx-n4">
+          <v-icon small> mdi-open-in-new</v-icon>
+        </v-btn>
+      </div>
       <!-- the info text : about this dialog -->
 
       <validation-observer ref="edit_form">
@@ -55,14 +61,18 @@
           {{ folder_title }}
         </v-btn>
       </div>
-
       <!-- button for choose the category has name for category choosed  -->
+
       <f-tree ref="folder_tree" @choose="choose_folder"></f-tree>
     </div>
+
     <template v-slot:actions>
-      <v-btn color="primary" class="mb-4" @click="update">{{
-        $vuetify.lang.t(`$vuetify.bookmark.form.save_btn`)
-      }}</v-btn>
+      <v-btn :loading="loading" color="primary" class="mb-4" @click="update">
+        <v-icon size="20px" class="px-1">
+          mdi-content-save-edit-outline
+        </v-icon>
+        {{ $vuetify.lang.t(`$vuetify.bookmark.edit.save_btn`) }}
+      </v-btn>
     </template>
     <!-- card action -->
   </base-dialog>
@@ -70,7 +80,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import { getBookmark } from '@/mixins/Bookmark'
 import BaseDialog from '@/components/dialog/BaseDialog'
 import FTree from '@/components/dialog/Folders/FTreeDailog'
 export default {
@@ -82,55 +93,118 @@ export default {
   },
   // --------- componets --------
 
+  mixins: [getBookmark],
+  // ------ mixins------
+
+  props: {
+    b_id: Number,
+  },
+  //------ props ------
+
   data: () => ({
-    dialog: false,
+    loading: false,
     folder_title: 'unPart',
     folder_icon: 'mdi-folder',
     title: '',
     desc: '',
   }),
-  // --------- data ------------
+  // ------ data ------
+
+  mounted() {
+    this.title = this.bookmark.title
+    this.desc = this.bookmark.description
+  },
+  //---- updated hook -----
 
   methods: {
+    ...mapMutations({
+      update_bookmark: 'bookmark/update_bookmark',
+      set_bookmark: 'bookmark/set_bookmark',
+      edit_state_toggle: 'bookmark/edit_state_toggle',
+      set_message: 'set_message',
+      toggle_message: 'toggle_message',
+    }),
+    // vuex - mutations
+
+    /**
+     *
+     */
     choose_folder(folder) {
       let this_folder = this.get_folders.find((value) => value.id == folder)
-      console.log(this_folder)
+
       this.folder_title = this_folder.name
       this.folder_icon = this_folder.icon
     },
 
     /**
      * for close and rest dialog
-     *
      */
     close() {
-      this.dialog = false
+      this.edit_state_toggle()
       this.title = ''
       this.desc = ''
       this.$refs.edit_form.reset()
+      setTimeout(() => {
+        this.set_bookmark(null)
+      }, 500)
     },
-    // ------------ close -----------------
+    // ----- close -------
 
     /**
      * check if input is valid after that send data to database and rest dialog
      *
      */
     update() {
-      this.$refs.edit_form.validate().then((success) => {
+      const data = {
+        url: this.bookmark.url,
+        description: this.desc,
+        title: this.title,
+      }
+      this.loading = true
+      this.$refs.edit_form.validate().then(async (success) => {
         if (success) {
-          alert('added data')
-
-          // this.$refs.url.reset()
+          await this.$axios
+            .put(`bookmarks/${this.bookmark.id}/`, data, {
+              auth: {
+                username: 'root',
+                password: 'root',
+              },
+            })
+            .then((res) => res.data)
+            .then((data) => {
+              this.update_bookmark(data, this.bookmark.id)
+              setTimeout(() => {
+                this.loading = false
+                this.close()
+                this.set_message({
+                  type: 'success',
+                  text: 'updated bookmark successful',
+                })
+              }, 1000)
+            })
+            .catch((er) => {
+              this.set_message({
+                type: 'error',
+                text: 'updated bookmark error',
+              })
+              this.loading = false
+            })
+          // put
         }
+        this.toggle_message(true)
       })
     },
-    // ------------ update -------------
+    // ----- update ------
   },
-  // ------------- methods ---------------
+  // ----- methods --------
+
   computed: {
     ...mapGetters({
+      bookmark: 'bookmark/get_bookmark',
       get_folders: 'folder/get_folders',
+      edit_state: 'bookmark/edit_state',
     }),
+    // vuex - getters
   },
 }
 </script>

@@ -1,14 +1,9 @@
 export default{
   bookmark:{
-      new_btn:"new bookmark",
-      chip_type_all:"bookmarks",
-      chip_type_temporary:"temporary",
-      chip_type_important:"important",
-      chip_type_tag:"tag",
+      new_btn:"new Link",
       menu_view:{
         list:"view by list",
-        big_grid:"view by big grid",
-        small_grid:"view by small grid"
+        big_grid:"view by grid",
       },
       menu_sort:{
         date_asc:"Sorted by date from oldest to newest",
@@ -16,18 +11,25 @@ export default{
         alpha_asc:"Sort by Alphabetical from Z to A",
         alpha_desc:"Sorted by Alphabetical from A to Z"
       },
-      form:{
-        add:{
-          header:"create new link",
+      create:{
+          header:"add bookmark",
+          save_btn:"save",
         },
         edit:{
-          header:"update old link",
+          header:"edit bookmark",
+          save_btn:"save",
         },
-        save_btn:"save",
-        link:"link",
-        title:"title",
-        desc:"description",
-      }
+        trash:{
+          header:'Send To Wastebasket',
+          trash_btn:"trash",
+          confirm:"Do you want to trash this bookmark? ",
+          message:"It will be sent to the wastebasket to stay for 30 days and will be destroyed automatically, and you can restore it from the wastebasket"
+        },
+        form:{
+          link:"link",
+          title:"title",
+          desc:"description",
+        }
     }
   }
 

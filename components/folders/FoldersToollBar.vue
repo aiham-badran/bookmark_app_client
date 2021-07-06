@@ -1,33 +1,27 @@
 <template>
-  <v-card
-    width="100%"
-    :height="height"
-    class="overflow-x-hidden"
-    color="background"
-    flat
-  >
-    <v-toolbar dense flat color="background">
-      <v-btn v-if="close" icon plain @click="$emit('close')">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-      <!-- btn for close folder sidebar in xs and sm screen -->
-      <!-- props close is true show this btn  -->
-
-      <v-btn icon plain @click="search_folder = true">
-        <v-icon>mdi-folder-plus-outline </v-icon>
-      </v-btn>
+  <div>
+    <v-toolbar dense flat class="px-2 mt-n1" color="background">
+      <!-- <v-btn small icon plain @click="search_folder = true">
+        <v-icon size="22px">mdi-folder-remove-outline </v-icon>
+      </v-btn> -->
       <!-- btn for create folder -->
 
-      <v-btn icon plain @click="close_tree_node()">
-        <v-icon size="20px">mdi-minus-box-multiple-outline </v-icon>
+      <!-- <v-btn small icon plain @click="$emit('remove_seleted')">
+        <v-icon size="22px">mdi-folder-plus-outline </v-icon>
+      </v-btn> -->
+      <!-- btn for create folder -->
+
+      <div class="mx-n2 text-subtitle-2">Folders</div>
+      <v-spacer></v-spacer>
+
+      <v-btn v-if="false" small icon plain @click="close_tree_node()">
+        <v-icon size="18px">mdi-minus-box-multiple-outline </v-icon>
       </v-btn>
       <!-- close all folder -->
 
-      <v-spacer></v-spacer>
-
       <list-menu v-if="option_menu" :items="folder_menu">
         <template v-slot:btn="{ attrs, on }">
-          <v-btn icon plain v-bind="attrs" v-on="on">
+          <v-btn class="mx-n6" icon plain v-bind="attrs" v-on="on">
             <v-icon>mdi-dots-vertical </v-icon>
           </v-btn>
         </template>
@@ -52,67 +46,22 @@
       </list-menu>
       <!-- menu lsit has options for folder -->
     </v-toolbar>
-    <!-- toolbar has tool for folder and tags -->
+    <!-- toolbar has actions icon -->
 
-    <v-divider></v-divider>
-    <!-- Drawing a divider for the toolbar at the bottom-->
-    <!-- top toolbar : has actions icon and menu options -->
-
-    <v-treeview
-      dense
-      transition
-      activatable
-      ref="folder_tree"
-      class="tree-view-folders tree-view-active text-subtitle-1 overflow-auto mt-1"
-      active-class=""
-      :style="{ maxHeight: `calc(${height} - 105px)` }"
-      :items="tree_of_folders"
-      :active.sync="active"
-      :filter="filter"
-      :search="filter_input"
-    >
-      <template v-slot:label="{ item }">
-        <div class="ml-3" @click="$emit('choose', item.id, active)">
-          {{ item.name }}
-        </div>
-      </template>
-      <!-- folder name -->
-
-      <template v-slot:prepend="{ item }">
-        <v-icon>{{ item.icon }}</v-icon>
-      </template>
-      <!-- folder icon  -->
-    </v-treeview>
+    <tree @folder_selected="action_on_item"></tree>
     <!-- tree show all folders -->
-
-    <v-toolbar absolute bottom min-width="100%" color="background" dense>
-      <v-text-field
-        dense
-        full-width
-        outlined
-        clearable
-        v-model="filter_input"
-        placeholder="Search"
-        style="font-size: 14px"
-        prepend-inner-icon="mdi-magnify"
-        background-color="background"
-        color="primary"
-        class="mt-4"
-      >
-      </v-text-field>
-      <!-- field for filter folders -->
-    </v-toolbar>
-    <!-- bottom toolbar: has filter folder -->
-  </v-card>
+  </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import ListMenu from '@/components/global/ListMenu'
+import Tree from '@/components/folders/TreeOfFolders.vue'
 export default {
   name: 'folders-tree',
   components: {
     ListMenu,
+    Tree,
   },
   // --------- components ----------
 
@@ -131,6 +80,9 @@ export default {
   data: () => ({
     active: undefined,
     filter_input: '',
+    f_load: false,
+    offsetTopTree: 0,
+    folder_options: false,
     folder_menu: [
       {
         title: 'Add new Folder',
@@ -140,22 +92,46 @@ export default {
       {
         divider: true,
       },
-      {
-        title: 'Close',
-        icon: 'mdi-close',
-        event: 'thi_close',
-      },
     ],
   }),
   //-------------- data ---------------
 
+  created() {
+    this.$nextTick().then(() => {
+      // this.offsetTopTree = this.$refs.folder_tree.$el.offsetTop
+    })
+  },
+  //------ created -------
+
+  async fetch() {
+    this.f_load = true
+    let folders = await this.$axios.$get('bookmarks/folders/', {
+      params: this.url_params,
+      auth: {
+        username: 'root',
+        password: 'root',
+      },
+    })
+
+    this.set_folders(folders)
+    this.b_load = false
+  },
+
   methods: {
+    ...mapMutations({
+      create_state_toggle: 'folder/create_state_toggle',
+      set_folders: 'folder/set_folders',
+      set_folder: 'folder/set_folder',
+    }),
+    //vuex Mutations
+
     onClick(event) {
       this[event]()
     },
-    thi_close(d) {
-      this.$emit('close')
-      console.log(d)
+
+    action_on_item(folder) {
+      this.set_folder(folder)
+      this.$emit('f_selected', folder.id)
     },
 
     close_tree_node(close = false) {
@@ -165,13 +141,13 @@ export default {
     // for close all opened node
     // --------- close_tree_node ----------
 
-    object_to_tree(list, parnt = null) {
+    object_to_tree(list, parent = null) {
       let folders = []
 
       // return array has all data except parents
       // and set parents data in items
       let remaining_folders = list.filter((folder) => {
-        if (folder.parent == parnt) {
+        if (folder.parent == parent) {
           folders.push(Object.assign({}, folder))
           return false
         } else return true
@@ -186,12 +162,15 @@ export default {
           if (children.length) folder['children'] = children
         })
       }
+
       return folders
     },
     // usign data geitting from database to create treeview object
     // ------------- object_to_tree -----------
 
     new_folder() {
+      console.log('folder')
+      this.create_state_toggle()
       if (this.active) {
         let id = Math.floor(Math.random() * 100 + 50)
         let folder = {
@@ -200,14 +179,15 @@ export default {
           parent: this.active[0].id,
         }
         this.data_folders.push(folder)
-        // console.log(this.folders)
+
         // if (!Array.isArray(this.active[0]['children']))
         //   this.active[0]['children'] = [folder]
         // else this.active[0]['children'].push(folder)
-        // console.log(this.active)
       }
     },
     // -------------- ---------------------
+
+    menu_folder_actions() {},
   },
   // ---------- methods ------------
 
@@ -226,6 +206,10 @@ export default {
     },
     // call function object_to_tree for convert data to tree
     // ------- tree_of_folders --------
+
+    minHeight() {
+      return 561 - this.offsetTopTree + 'px'
+    },
   },
   // ------ computed -------
 
@@ -248,5 +232,11 @@ export default {
   overflow: unset;
   text-overflow: unset;
   padding-right: 30px;
+}
+.folder-active {
+  color: #5963ec;
+}
+.d-visible-hidden {
+  visibility: hidden;
 }
 </style>

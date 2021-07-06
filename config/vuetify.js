@@ -27,7 +27,7 @@ export default {
         success: colors.green.accent3
       },
       light:{
-        main:"#f0f0f0",
+        main:"#fff",
         background: "#fefefe",
         primary: colors.blue.lighten1,
         accent: colors.grey.darken3,

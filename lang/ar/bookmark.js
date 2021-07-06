@@ -1,14 +1,10 @@
 export default{
   bookmark:{
     new_btn:"علامة جديدة",
-    chip_type_all:"العلامات",
-    chip_type_temporary:"مؤقت",
-    chip_type_important:"المهمة",
-    chip_type_tag:"التصنيفات",
     menu_view:{
       list:"العرض على شكل قائمة",
-      big_grid:"العرض على شكل شبكة كبيرة",
-      small_grid:"العرض على شكل شبكة صغيرة"
+      big_grid:"العرض على شكل شبكة ",
+
     },
     menu_sort:{
       date_asc:"مرتبة حسب التاريخ من الأقدم إلى الأحدث",
@@ -16,17 +12,26 @@ export default{
       alpha_asc:"ترتيب أبجدي من ي إلى أ",
       alpha_desc:"مرتبة أبجديًا من أ إلى ي"
     },
-    form:{
-      add:{
+
+    create:{
         header:"إنشاء رابط جديد",
+        save_btn:"حفظ",
       },
       edit:{
         header:"تعديل رابط قديم",
+        save_btn:"حفظ",
       },
-      save_btn:"حفظ",
-      link:"الرابط",
-      title:"العنوان",
-      desc:"الوصف",
-    }
+      trash:{
+        header:'إرسال إلى سلة المهملات',
+        btn:"حذف",
+        confirm :"هل تريد التخلص من هذه الإشارة المرجعية؟ ",
+        message:"سيتم إرساله إلى سلة المهملات ليبقى لمدة 30 يومًا وسيتم حذفها نهائيا بشكل  تلقائيًا ، ويمكنك استعادته من سلة المهملات"
+      },
+      form:{
+        link:"الرابط",
+        title:"العنوان",
+        desc:"الوصف",
+      }
+
   }
 }

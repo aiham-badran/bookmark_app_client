@@ -1,14 +1,20 @@
 <template>
-  <div v-if="loading" class="loading-page">
-    <p>Loading...</p>
+  <div class="loading-page d-flex flex-column justify-center align-center">
+    <v-progress-circular
+      size="75"
+      color="primary"
+      indeterminate
+    ></v-progress-circular>
+    <p class="my-4 text-capitalize text-subtitle-2">loading bookmark ....</p>
   </div>
 </template>
 
 <script>
 export default {
-  data: () => ({
+  props: {
     loading: false,
-  }),
+  },
+  data: () => ({}),
   methods: {
     start() {
       this.loading = true
@@ -22,15 +28,6 @@ export default {
 
 <style scoped>
 .loading-page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  padding-top: 200px;
-  font-size: 30px;
-  font-family: sans-serif;
+  transform: translateY(100%);
 }
 </style>

@@ -16,6 +16,7 @@ export default {
     dark: true,
     themes: {
       dark: {
+        noColro: 'transparent',
         main:"#090b13",
         background: '#111525',
         primary: colors.blue.darken2,

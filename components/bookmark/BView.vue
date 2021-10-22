@@ -7,8 +7,8 @@
         </v-btn>
       </v-toolbar> -->
     <!-- toolbar view card options -->
-    <loading v-if="loading"></loading>
-    <div v-else style="position: relative; min-height: 50vh">
+    <!-- <loading v-if="loading"></loading> -->
+    <div style="position: relative; min-height: 50vh;">
       <div>
         <template v-if="card_view_list && !isMobileOrTablet">
           <b-view-list
@@ -58,13 +58,13 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { isMobile } from '@/mixins/ForMobile'
-import BViewList from '@/components/bookmark/BViewList'
-import BViewGrid from '@/components/bookmark/BViewGrid'
-import loading from '@/components/LoadingComponent.vue'
+import { mapGetters, mapMutations, mapActions } from "vuex";
+import { isMobile } from "@/mixins/ForMobile";
+import BViewList from "@/components/bookmark/BViewList";
+import BViewGrid from "@/components/bookmark/BViewGrid";
+import loading from "@/components/LoadingComponent.vue";
 export default {
-  name: 'bookmarks-view',
+  name: "bookmarks-view",
 
   components: {
     BViewList,
@@ -84,44 +84,43 @@ export default {
 
   methods: {
     ...mapMutations({
-      add_query: 'bookmark/add_query',
-      remove_query: 'bookmark/remove_query',
+      add_query: "bookmark/add_query",
+      remove_query: "bookmark/remove_query",
     }),
     //vuex - mutations
 
     ...mapActions({
-      fetch_bookmarks: 'bookmark/fetch_bookmarks',
+      fetch_bookmarks: "bookmark/fetch_bookmarks",
     }),
     page_by_number(number) {
       if (this.pages.current_page != number) {
-        this.add_query({ page: number })
-        this.fetch_bookmarks()
+        this.add_query({ page: number });
+        this.fetch_bookmarks();
       }
     },
 
     next_page() {
       if (this.pages.next) {
-        this.add_query({ page: this.pages.next })
+        this.add_query({ page: this.pages.next });
       }
     },
     previous_page() {
       if (this.pages.previous) {
-        this.add_query({ page: this.pages.previous })
+        this.add_query({ page: this.pages.previous });
       }
     },
   },
   beforeDestroy() {
-    this.remove_query('page')
+    this.remove_query("page");
   },
   computed: {
     ...mapGetters({
-      bookmarks: 'bookmark/get_bookmarks',
-      pages: 'bookmark/get_bookmark_pages',
-      loading: 'bookmark/loading_state',
+      bookmarks: "bookmark/get_bookmarks",
+      pages: "bookmark/get_bookmark_pages",
+      loading: "bookmark/loading_state",
     }),
   },
-}
+};
 </script>
 
-<style>
-</style>
+<style></style>
